@@ -51,11 +51,12 @@ begin
 
   reg.OpenKey('CLSID\' + classIDString, true);
   reg.WriteString('', desc);
+  reg.CloseKey;
 
   reg.OpenKey('CLSID\' + classIDString + '\ProgID', true);
   reg.WriteString('', name);
-
   reg.CloseKey;
+
   reg.Free;
 
   StringToWideChar(desc, buffer, sizeof(buffer));

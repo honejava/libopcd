@@ -12,10 +12,10 @@ unit ROPC_TLB;
 // ************************************************************************ //
 
 // PASTLWTR : 1.2
-// File generated on 9/11/2006 2:25:50 PM from Type Library described below.
+// File generated on 9/12/2006 3:17:41 PM from Type Library described below.
 
 // ************************************************************************  //
-// Type Lib: C:\dopc\trunk\example\opc_test.tlb (1)
+// Type Lib: S:\libopcd\trunk\example\opc_test.tlb (1)
 // LIBID: {63E0E954-A095-40C2-916A-2580685D44F0}
 // LCID: 0
 // Helpfile: 

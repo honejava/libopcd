@@ -1,3 +1,8 @@
+*SVN*
+
+* Fixed bug in server registration.
+* Changed minimal update rate to 10ms.
+
 *0.1*
 
 * Imported code into repository.

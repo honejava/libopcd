@@ -11,7 +11,7 @@ type
   end;
 
   TOPCItemProxy = class
-  private
+  protected
     _ref: string;
     _lock: TCriticalSection;
     _subscribers: TList;
