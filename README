@@ -1,0 +1,21 @@
+DOPC - Delphi OPC-DA Server Library - Version 0.1
+-------------------------------------------------
+
+DOPC is a light-weight Delphi library for easily implementing OPC-DA servers.
+Since the OPC-DA API is quite elaborate, DOPC makes some assumptions. For 
+example, deadbands and access paths are not used. Also, a flat namespace is 
+assumed. In other words, you might need to make changes to some of the 
+underlying classes, but for most cases you won't need to.
+
+To implement an OPC-DA server using DOPC, you need to do the following:
+
+1. Create a type library with two interfaces: IDA2 and IOPCGroup.
+2. Create a subclass of TOPCGroup, which also implements IOPCGroup. 
+3. Create a subclass of TDA2 which also implements IDA2, and override four 
+   methods: createGroup, findProxy, fillRefList and checkItemRef.
+4. call registerOPCServer with the right classes and interfaces.
+5. periodically call scanOPCServers.
+
+The source code is more or less self-describing. The example application shows
+a very basic OPC server working. This code is very new and largely untested.
+Use at your own risk.
