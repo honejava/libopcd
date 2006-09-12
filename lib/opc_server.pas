@@ -69,7 +69,7 @@ type
     function SaveCompleted(pszFileName: POleStr): HResult; stdcall;
     function GetCurFile(out pszFileName: POleStr): HResult; stdcall;
 //IPersistFile end
-  private
+  protected
     _lock: TCriticalSection;
     _groups: TList;
     _localID: longword;
@@ -109,10 +109,11 @@ type
     procedure getServerInfo(var ppServerStatus: POPCSERVERSTATUS); virtual;
     function findProxy(const ref: string): TOPCItemProxy; virtual; abstract;
     procedure fillItemRefList(list: TStringList); virtual; abstract;
-    function checkItemRef(const ref: string): boolean; virtual; abstract;
+    function checkItemRef(var ref: string): boolean; virtual; abstract;
   end;
 
 procedure scanOPCServers;
+procedure KillOPCServers;
 
 implementation
 
@@ -391,11 +392,14 @@ begin
 end;
 
 function TDA2.GetItemID(szItemDataID: POleStr; out szItemID: POleStr): HResult;
+var
+  ref: string;
 begin
   _lock.acquire;
   try
-    if checkItemRef(szItemDataID) then begin
-      szItemId := StringToLPOLESTR(szItemDataID);
+    ref := szItemDataID;
+    if checkItemRef(ref) then begin
+      szItemId := StringToLPOLESTR(ref);
       result := S_OK;
     end else
       result := OPC_E_UNKNOWNITEMID;
@@ -667,7 +671,7 @@ end;
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-procedure KillServers;
+procedure KillOPCServers;
 var
   i: integer;
   server: TDA2;
@@ -677,7 +681,6 @@ begin
     CoDisconnectObject(server as IUnknown,0);
     server.Free;
   end;
-  FreeAndNil(_servers);
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -687,6 +690,6 @@ initialization
   _serversLock := TCriticalSection.create;
   ComServer.UIInteractive:=false;
 finalization
+  KillOPCServers;
   CoUninitialize;
-  KillServers;
 end.

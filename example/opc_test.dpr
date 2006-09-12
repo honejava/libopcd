@@ -71,7 +71,7 @@ type
       requestedUpdateRate: longword; clientHandle: OPCHANDLE; LCID: longword): pointer; override;
     function findProxy(const ref: string): TOPCItemProxy; override;
     procedure fillItemRefList(list: TStringList); override;
-    function checkItemRef(const ref: string): boolean; override;
+    function checkItemRef(var ref: string): boolean; override;
     procedure scan(time: TDateTime); override;
   end;
 
@@ -212,7 +212,7 @@ begin
   list.add('V1');
 end;
 
-function TRealityOPCServer.checkItemRef(const ref: string): boolean;
+function TRealityOPCServer.checkItemRef(var ref: string): boolean;
 begin
   result := (ref = 'time') or (ref = 'tick') or (ref = 'V1');
 end;
@@ -228,7 +228,7 @@ end;
 
 begin
   CoInitialize(nil);
-  registerOPCServer('ROPC.DA2', 'ROPC', TRealityOPCServer, CLASS_DA2,
+  registerOPCServer('ROPC', 'ROPC', TRealityOPCServer, CLASS_DA2,
     TRealityOPCGroup, CLASS_OPCGroup);
 
   Application.Initialize;

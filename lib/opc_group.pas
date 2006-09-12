@@ -845,8 +845,8 @@ end;
 
 function TOPCGroup.ValidateRequestedUpDateRate(requestedUpdateRate: DWORD): DWORD;
 begin
-  if (requestedUpdateRate < 200) then
-    _requestedUpdateRate := 200
+  if (requestedUpdateRate < 10) then
+    _requestedUpdateRate := 10
   else
     _requestedUpdateRate := requestedUpdateRate;
   result := _requestedUpdateRate;
