@@ -1,0 +1,53 @@
+[
+  uuid(63E0E954-A095-40C2-916A-2580685D44F0), 
+  version(1.0), 
+  helpstring("opc_test Library")
+    
+]
+library ROPC
+{
+
+  importlib("STDOLE2.TLB");
+
+  [
+    uuid(C82218F9-2F0D-4B03-8746-A12D3EB4F4D7), 
+    version(2.0), 
+    helpstring("Dispatch interface for Data Access 2.0 Object"), 
+    dual, 
+    oleautomation
+  ]
+   interface IDA2: IDispatch
+  {
+  };
+
+  [
+    uuid(E8E5FF04-0CD1-46C7-AB54-D09503817522), 
+    version(2.0), 
+    helpstring("ROPC DA Object"), 
+    appobject, 
+    predeclid, 
+    hidden
+  ]
+  coclass DA2
+  {
+    [default] interface IDA2;
+  };
+
+  [
+    uuid(02EFEFC8-2A35-4C7D-A7E2-28CC24C7BA82), 
+    version(1.0)
+  ]
+   interface IOPCGroup: IUnknown
+  {
+  };
+
+  [
+    uuid(2E830FD8-F895-4E6C-A82E-BB477A34315C), 
+    version(1.0)
+  ]
+  coclass OPCGroup
+  {
+    [default] interface IOPCGroup;
+  };
+
+}; 
