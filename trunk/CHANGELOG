@@ -1,6 +1,11 @@
 *SVN*
 
+* Refactored registration code.
+
+* Changed scan methods to work without time stamp.
+
 * Fixed bug in server registration.
+
 * Changed minimal update rate to 10ms.
 
 *0.1*
