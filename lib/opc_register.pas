@@ -33,35 +33,42 @@ var
   classIDString: string;
   buffer: array [0..255] of wideChar;
 begin
-  TAutoObjectFactory.Create(ComServer, serverClass, serverGuid, ciMultiInstance, tmFree);
-  TTypedComObjectFactory.Create(ComServer, groupClass, groupGuid, ciMultiInstance, tmFree);
-  registerEnumerators;
+  try
+    TAutoObjectFactory.Create(ComServer, serverClass, serverGuid,
+      ciMultiInstance, tmFree);
+    TTypedComObjectFactory.Create(ComServer, groupClass, groupGuid,
+      ciMultiInstance, tmFree);
+    registerEnumerators;
 
-  classIDString := GUIDToString(serverGuid);
-  reg := TRegistry.Create;
-  reg.RootKey := HKEY_CLASSES_ROOT;
+    classIDString := GUIDToString(serverGuid);
+    reg := TRegistry.Create;
+    reg.RootKey := HKEY_CLASSES_ROOT;
 
-  reg.OpenKey(name, true);
-  reg.WriteString('', desc);
-  reg.CloseKey;
+    reg.OpenKey(name, true);
+    reg.WriteString('', desc);
+    reg.CloseKey;
 
-  reg.OpenKey(name + '\Clsid', true);
-  reg.WriteString('', classIDString);
-  reg.CloseKey;
+    reg.OpenKey(name + '\Clsid', true);
+    reg.WriteString('', classIDString);
+    reg.CloseKey;
 
-  reg.OpenKey('CLSID\' + classIDString, true);
-  reg.WriteString('', desc);
-  reg.CloseKey;
+    reg.OpenKey('CLSID\' + classIDString, true);
+    reg.WriteString('', desc);
+    reg.CloseKey;
 
-  reg.OpenKey('CLSID\' + classIDString + '\ProgID', true);
-  reg.WriteString('', name);
-  reg.CloseKey;
+    reg.OpenKey('CLSID\' + classIDString + '\ProgID', true);
+    reg.WriteString('', name);
+    reg.CloseKey;
 
-  reg.Free;
+    reg.Free;
 
-  StringToWideChar(desc, buffer, sizeof(buffer));
-  CreateComponentCategory(CATID_OPCDAServer20, buffer);
-  RegisterCLSIDInCategory(serverGuid, CATID_OPCDAServer20);
+    StringToWideChar(desc, buffer, sizeof(buffer));
+    CreateComponentCategory(CATID_OPCDAServer20, buffer);
+    RegisterCLSIDInCategory(serverGuid, CATID_OPCDAServer20);
+
+    ComServer.UpdateRegistry(true);
+  except
+  end;
 end;
 
 end.

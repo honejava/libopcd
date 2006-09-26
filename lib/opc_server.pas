@@ -87,6 +87,7 @@ type
     procedure initialize; override;
     procedure shutdownOnConnect(const sink: IUnknown; connecting: boolean);
 
+    constructor create;
     destructor destroy;override;
     function makeGroupServerHandle: longword;
     function makeItemServerHandle: longword;
@@ -97,7 +98,7 @@ type
     procedure removeGroupRef(group: TObject);
     function fillGroupNameList(list: TStringList;publicFlag: boolean): TStringList;
     function fillGroupInterfaceList(list: TList;publicFlag: boolean): TList;
-    procedure scan(time: TDateTime); virtual;
+    procedure scan; virtual;
     function createGroup(server: TDA2; name: string; active: boolean;
       requestedUpdateRate: DWORD; clientHandle: OPCHANDLE; LCID: DWORD): pointer; virtual; abstract;
 
@@ -150,7 +151,7 @@ begin
   _serversLock.acquire;
   try
     for i := 0 to _servers.count - 1 do
-      TDA2(_servers[i]).scan(now);
+      TDA2(_servers[i]).scan;
   finally
     _serversLock.release;
   end;
@@ -352,7 +353,6 @@ end;
 
 function TDA2.RemovePublicGroup(hServerGroup: OPCHANDLE; bForce: BOOL): HResult;
 begin
-
   result := RemoveGroup(hServerGroup, bForce);
 end;
 
@@ -469,6 +469,12 @@ begin
     _clientSink := nil
 end;
 
+constructor TDA2.create;
+begin
+  inherited create;
+  messagebeep($FFFF);
+end;
+
 destructor TDA2.destroy;
 var
   i: integer;
@@ -483,7 +489,7 @@ begin
   if Assigned(_opcItemProperties) then _opcItemProperties.Free;
 
   _lock.free;
-  inherited;
+  inherited destroy;
 end;
 
 function TDA2.makeGroupServerHandle: longword;
@@ -492,9 +498,7 @@ begin
   try
     inc(_lastGroupServerHandle);
     result := _lastGroupServerHandle;
-  finally
-    _lock.release;
-  end;
+  finally _lock.release; end;
 end;
 
 function TDA2.makeItemServerHandle: longword;
@@ -503,9 +507,7 @@ begin
   try
     inc(_lastItemServerHandle);
     result := _lastItemServerHandle;
-  finally
-    _lock.release;
-  end;
+  finally _lock.release; end;
 end;
 
 function TDA2.findGroupByServerHandle(serverHandle: DWORD): pointer;
@@ -520,9 +522,7 @@ begin
         exit;
       end;
     result := nil;
-  finally
-    _lock.release;
-  end;
+  finally _lock.release; end;
 end;
 
 function TDA2.findGroupByName(const name: string): pointer;
@@ -537,9 +537,7 @@ begin
         exit;
       end;
     result := nil;
-  finally
-    _lock.release;
-  end;
+  finally _lock.release; end;
 end;
 
 procedure TDA2.addGroupRef(group: TObject);
@@ -547,9 +545,7 @@ begin
   _lock.acquire;
   try
     _groups.add(group);
-  finally
-    _lock.release;
-  end;
+  finally _lock.release; end;
 end;
 
 procedure TDA2.removeGroupRef(group: TObject);
@@ -557,9 +553,7 @@ begin
   _lock.acquire;
   try
     _groups.remove(group);
-  finally
-    _lock.release;
-  end;
+  finally _lock.release; end;
 end;
 
 function TDA2.fillGroupNameList(list: TStringList; publicFlag: boolean): TStringList;
@@ -573,9 +567,7 @@ begin
     for i := 0 to _groups.count - 1 do
       if TOPCGroup(_groups[i]).isPublic = publicFlag then
         result.Add(TOPCGroup(_groups[i]).name);
-  finally
-    _lock.release;
-  end;
+  finally _lock.release; end;
 end;
 
 function TDA2.fillGroupInterfaceList(list: TList;publicFlag: boolean): TList;
@@ -593,23 +585,19 @@ begin
         IUnknown(TOPCGroup(_groups[i])).QueryInterface(IUnknown, obj);
         if Assigned(obj) then list.Add(obj);
       end;
-  finally
-    _lock.release;
-  end;
+  finally _lock.release; end;
 end;
 
-procedure TDA2.scan(time: TDateTime);
+procedure TDA2.scan;
 var
   i: integer;
 begin
   _lock.acquire;
   try
-    _lastUpdateTime := time;
+    _lastUpdateTime := now;
     for i := 0 to _groups.count - 1 do
       TOPCGroup(_groups[i]).scan;
-  finally
-    _lock.release;
-  end;
+  finally _lock.release; end;
 end;
 
 function TDA2.CreateGroupNameEnumerator(filter, publicFlag: boolean): IUnknown;
@@ -625,9 +613,7 @@ begin
       fillGroupNameList(list, true);
     end;
     result := TOPCStringsEnumerator.Create(list);
-  finally
-    if list <> nil then list.free;
-  end;
+  finally if list <> nil then list.free; end;
 end;
 
 function TDA2.CreateGroupInterfaceEnumerator(filter, publicFlag: boolean): IUnknown;
@@ -643,9 +629,7 @@ begin
       fillGroupInterfaceList(list, true);
     end;
     result := TS3UnknownEnumerator.Create(list);
-  finally
-    if list <> nil then list.free;
-  end;
+  finally if list <> nil then list.free; end;
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -676,10 +660,12 @@ var
   i: integer;
   server: TDA2;
 begin
-  for i := _servers.count - 1 downto 0 do begin
+  for i := _servers.count - 1 downto 0 do
+  try
     server := _servers[i];
     CoDisconnectObject(server as IUnknown,0);
     server.Free;
+  except
   end;
 end;
 
@@ -690,6 +676,6 @@ initialization
   _serversLock := TCriticalSection.create;
   ComServer.UIInteractive:=false;
 finalization
-  KillOPCServers;
+  try KillOPCServers; except end;
   CoUninitialize;
 end.
