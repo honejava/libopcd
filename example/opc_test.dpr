@@ -72,7 +72,7 @@ type
     function findProxy(const ref: string): TOPCItemProxy; override;
     procedure fillItemRefList(list: TStringList); override;
     function checkItemRef(var ref: string): boolean; override;
-    procedure scan(time: TDateTime); override;
+    procedure scan; override;
   end;
 
   TRealityOPCGroup = class (TOPCGroup, IOPCGroup)
@@ -217,9 +217,9 @@ begin
   result := (ref = 'time') or (ref = 'tick') or (ref = 'V1');
 end;
 
-procedure TRealityOPCServer.scan(time: TDateTime);
+procedure TRealityOPCServer.scan;
 begin
-  inherited scan(time);
+  inherited scan;
   if timeProxy <> nil then
     timeProxy.scan;
   if tickProxy <> nil then

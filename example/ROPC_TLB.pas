@@ -12,7 +12,7 @@ unit ROPC_TLB;
 // ************************************************************************ //
 
 // PASTLWTR : 1.2
-// File generated on 9/12/2006 3:17:41 PM from Type Library described below.
+// File generated on 9/26/2006 4:30:02 PM from Type Library described below.
 
 // ************************************************************************  //
 // Type Lib: S:\libopcd\trunk\example\opc_test.tlb (1)
